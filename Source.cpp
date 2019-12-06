@@ -1,4 +1,4 @@
-п»ї#include <iostream>
+#include <iostream>
 #include <ctime>
 #include <random>
 #include <vector>
@@ -6,10 +6,10 @@
 #include <assert.h>
 
 
-
+bool print = true;
 using namespace std;
 
-void print_graph(bool** matrix, int n){
+void print_graph(bool** matrix, int n) {
 
 	for (int i = 0; i < n; i++) {
 		for (int j = 0; j < n; j++) {
@@ -33,22 +33,22 @@ void print_graph(vector<vector<int>>& x, int n) {
 
 }
 
-void Graph_gen(bool** matrix, int n_, int edges){
-	
+void Graph_gen(bool** matrix, int n_, int edges) {
+
 	int n = n_;
 
-	
+
 	if (edges < (n - 1)) assert("Wrong number of edges");
-	//Р—Р°РґР°РµС‚СЃСЏ РєРѕР»РёС‡РµСЃС‚РІРѕ СЂРµР±РµСЂ, РєРѕС‚РѕСЂС‹Рµ РЅРµРѕР±С…РѕРґРёРјРѕ РґРѕРіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ 
+	//Задается количество ребер, которые необходимо догенерировать 
 	edges -= (n - 1);
 
 	int tmp = 0;
 	//int tmp2 = 0;
 
-	//РЎРѕР·РґР°СЋС‚СЃСЏ РґРІР° СЃРІСЏР·РЅС‹С… РїРѕРґРіСЂР°С„Р°, С‡С‚РѕР±С‹ РЅР° РІС‹С…РѕРґРµ РІСЃРµРіРґР° Р±С‹Р»Р° С…РѕС‚СЏ Р±С‹ 1 С‚РѕС‡РєР° СЃРѕС‡Р»РµРЅРµРЅРёСЏ
-	
-	//РџРµСЂРІС‹Р№ РїРѕРґРіСЂР°С„: СЃРЅР°С‡Р°Р»Р° СЃРІСЏР¶РµРј 0 Рё 1 РІРµСЂС€РёРЅСѓ, РґР°Р»СЊС€Рµ Р±СѓРґРµРј СЃРІСЏР·С‹РІР°С‚СЊ СЃ РїСЃРµРІРґРѕСЃР»СѓС‡Р°Р№РЅРѕР№ РІРµСЂС€РёРЅС‹,
-	//РЅРѕРјРµСЂ РєРѕС‚РѕСЂРѕР№ РјРµРЅСЊС€РµР№ РЅРѕРјРµСЂР° С‚РµРєСѓС‰РµР№
+	//Создаются два связных подграфа, чтобы на выходе всегда была хотя бы 1 точка сочленения
+
+	//Первый подграф: сначала свяжем 0 и 1 вершину, дальше будем связывать с псевдослучайной вершины,
+	//номер которой меньшей номера текущей
 	matrix[0][1] = true;
 	matrix[1][0] = true;
 	int half = n / 2;
@@ -59,7 +59,7 @@ void Graph_gen(bool** matrix, int n_, int edges){
 		matrix[tmp][i] = true;
 	}
 
-	//Р”РѕР±Р°РІР»СЏРµРј РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ СЂРµР±СЂР°, С‡С‚РѕР±С‹ РЅРµ Р±С‹Р»Рѕ СЃР»РёС€РєРѕРј РјРЅРѕРіРѕ С‚РѕС‡РµРє СЃРѕС‡Р»РµРЅРµРЅРёСЏ 
+	//Добавляем дополнительные ребра, чтобы не было слишком много точек сочленения 
 	int tmp1 = 0;
 	int tmp2 = 0;
 	for (int i = 0; i < edges / 2; i++)
@@ -70,11 +70,11 @@ void Graph_gen(bool** matrix, int n_, int edges){
 		matrix[tmp2][tmp1] = true;
 	}
 
-	//Р’С‚РѕСЂРѕР№ РїРѕРґРіСЂР°С„: РіРµРЅРµСЂР°С†РёСЏ Р°РЅР°Р»РѕРіРёС‡РЅР° РїРµСЂРІРѕРјСѓ, РЅРѕ РґСЂСѓРіРёРµ РіСЂР°РЅРёС†С‹
-	//Р”РѕР±Р°РІР»СЏРµРј СЂРµР±СЂР° РІ СЌС‚РѕС‚ РїРѕРґРіСЂР°С„, С‡С‚РѕР±С‹ РїРѕР»СѓС‡РёС‚СЊ РЅСѓР¶РЅРѕ РєРѕР»-РІРѕ 
+	//Второй подграф: генерация аналогична первому, но другие границы
+	//Добавляем ребра в этот подграф, чтобы получить нужно кол-во 
 
-	matrix[half][half+1] = true;
-	matrix[half+1][half] = true;
+	matrix[half][half + 1] = true;
+	matrix[half + 1][half] = true;
 
 	for (int i = half + 2; i < n; i++)
 	{
@@ -83,18 +83,18 @@ void Graph_gen(bool** matrix, int n_, int edges){
 		matrix[tmp][i] = true;
 	}
 
-	//Р”РѕР±Р°РІР»СЏРµРј РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ СЂРµР±СЂР°, С‡С‚РѕР±С‹ РЅРµ Р±С‹Р»Рѕ СЃР»РёС€РєРѕРј РјРЅРѕРіРѕ С‚РѕС‡РµРє СЃРѕС‡Р»РµРЅРµРЅРёСЏ 
+	//Добавляем дополнительные ребра, чтобы не было слишком много точек сочленения 
 	for (int i = 0; i <edges - (edges / 2); i++)
 	{
-		tmp1 = rand() % (half) + (half);;
-		tmp2 = rand() % (half) + (half);;
+		tmp1 = rand() % (half)+(half);;
+		tmp2 = rand() % (half)+(half);;
 		matrix[tmp1][tmp2] = true;
 		matrix[tmp2][tmp1] = true;
 	}
 
-	//РЎРѕРµРґРёРЅСЏРµРј РґРІР° РїРѕРґРіСЂР°С„Р°
-	matrix[half][half-1] = true;
-	matrix[half-1][half] = true;
+	//Соединяем два подграфа
+	matrix[half][half - 1] = true;
+	matrix[half - 1][half] = true;
 
 	//if (n < 50) print_graph(matrix, n);
 
@@ -113,31 +113,32 @@ void matrix_to_list(vector<vector<int>>& list, bool** matrix, int n) {
 		delete[] matrix[p];
 	}
 
-	if (n < 50) print_graph(list, n);
+	//if (n < 50) print_graph(list, n);
 }
 
 void IS_CUTPOINT(int v) {
+	if (print)
 	cout << "Cut point: " << v << endl;
 }
 
 void dfs(int v, int p, int n, bool** g, int timer, bool* used, int* tin, int* fup) {
-	
+
 	used[v] = true;
 	tin[v] = fup[v] = timer++;
 	int children = 0;
 
 	for (size_t i = 0; i < n; ++i) {
 		int to = 0;
-		if (g[v][i]) 
+		if (g[v][i])
 			to = i;
 		else
 			continue;
-		
+
 		if (to == p || i == v)  continue;
 		if (used[to])
 			fup[v] = min(fup[v], tin[to]);
 		else {
-			dfs( to,  p,  n, g,  timer,  used,  tin,  fup);
+			dfs(to, p, n, g, timer, used, tin, fup);
 			fup[v] = min(fup[v], fup[to]);
 			if (fup[to] >= tin[v] && p != -1)
 				IS_CUTPOINT(v);
@@ -162,12 +163,12 @@ void dfs_list(int v, int p, int n, vector<vector<int>>& g, int timer, bool* used
 		else {
 			dfs_list(to, p, n, g, timer, used, tin, fup);
 			fup[v] = min(fup[v], fup[to]);
-			if (fup[to] >= tin[v] && p != -1)//РЎС‚Р°РЅРґР°СЂС‚РЅРѕРµ СѓСЃР»РѕРІРёРµ Р°Р»РіРѕСЂРёС‚РјР°
+			if (fup[to] >= tin[v] && p != -1)//Стандартное условие алгоритма
 				IS_CUTPOINT(v);
 			++children;
 		}
 	}
-	if (p == -1 && children > 1) //РџСЂРѕРІРµСЂРєР° РїСЂРё СѓСЃР»РѕРІРёРё, С‡С‚Рѕ РІРµСЂС€РёРЅР° - РєРѕСЂРµРЅСЊ
+	if (p == -1 && children > 1) //Проверка при условии, что вершина - корень
 		IS_CUTPOINT(v);
 
 }
@@ -178,49 +179,64 @@ int main()
 	int n = 0;
 	int edges = 0;
 
-	for (int i = 0; i < 5; i++) {
-		for (int k = 0; k < 6; k++) {
-			n = (i + 1) * 10; //Р“РµРЅРµСЂР°С†РёСЏ РєРѕР»-РІР° РІРµСЂС€РёРЅ
-			edges = (n - 1) + floor(3.7 * k);//Р“РµРЅРµСЂР°С†РёСЏ РєРѕР»-РІР° СЂРµР±РµСЂ
-			
-			//РЎРѕР·РґРІРЅРёРµ РјР°СЃСЃРёРІРѕРІ, РЅРµРѕР±С…РѕРґРёРјС‹С… РґР»СЏ СЂР°Р±РѕС‚С‹ Р°Р»РіРѕСЂРёС‚РјР°
+	for (int i = 0; i < 1; i++) {
+		for (int k = 0; k < 2; k++) {
+
+			n = (i + 1) * 10; //Генерация кол-ва вершин
+			edges = (n - 1) + floor(3.7 * k);//Генерация кол-ва ребер
+
+											 //Создвние массивов, необходимых для работы алгоритма
 			bool** matrix = new bool*[n];
-			for (int i = 0; i < n; i++) {
-				matrix[i] = new bool[n];
-				memset(matrix[i], false, n);
+			for (int i1 = 0; i1 < n; i1++) {
+				matrix[i1] = new bool[n];
+				memset(matrix[i1], false, n);
 			}
+			vector<vector<int>> list;
+			list.resize(n);
+			list.shrink_to_fit();
 
 			bool* used = new bool[n];
 			memset(used, false, n);
 			int timer = 0;
 			int* tin = new int[n];
 			int* fup = new int[n];
-			vector<vector<int>> list;
-			list.resize(n);
-			list.shrink_to_fit();
+
 
 			cout << "/////////////////////////////////////////////" << endl;
 			cout << "Number of vertex: " << n << "  edges: " << edges << endl;
 
-			//Р“РµРЅРµСЂР°С†РёСЏ РІС…РѕРґРЅС‹С… РґР°РЅРЅС‹С…
+			//Генерация входных данных
 			Graph_gen(matrix, n, edges);
 			matrix_to_list(list, matrix, n); //Convert matrix to list and delete matrix from memory
 
-			//dfs(0, -1, n, matrix, timer, used, tin, fup);
+											 //dfs(0, -1, n, matrix, timer, used, tin, fup);
 
-			
-			size_t start = clock();
+			unsigned long long sum = 0;
 
-			//Р’С‹Р·РѕРІ СЃР°РјРѕРіРѕ Р°Р»РіРѕСЂРёС‚РјР°
-			dfs_list(0, -1, n, list, timer, used, tin, fup);
+			for (int t = 0; t < 10; t++) {
+				if (t == 0) print_graph(list, n);
+				used = new bool[n];
+				memset(used, false, n);
+				timer = 0;
+				tin = new int[n];
+				fup = new int[n];
 
-			size_t end = clock();
-			cout << "time of execution is " << start / 1000. << " s" << endl << endl;
+				size_t start = clock();
+
+				//Вызов самого алгоритма
+				dfs_list(0, -1, n, list, timer, used, tin, fup);
+
+				size_t end = clock();
+				sum += (end - start);
+				print = false;
+			}
+			cout << "time of execution is " << (sum / 10000.) << " s" << endl << endl;
+			print = true;
 			delete[] used;
 			delete[] tin;
 			delete[] fup;
 		}
 	}
- 	system("pause");
+	system("pause");
 	return 0;
 }
