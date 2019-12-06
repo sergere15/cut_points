@@ -5,8 +5,32 @@
 #include <algorithm>
 using namespace std;
 
-void Graph_gen(bool** matrix, int n_)
-{
+void print_graph(bool** matrix, int n){
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			cout << matrix[i][j] << " ";
+
+		}
+		cout << endl;
+	}
+}
+
+void print_graph(vector<vector<int>>& x, int n) {
+
+	for (int i = 0; i < n; i++) {
+		cout << i << ": ";
+		for (int j = 0; j < x[i].size(); j++) {
+			cout << x[i][j] << " ";
+
+		}
+		cout << endl;
+	}
+
+	cout << "////////////////////////" << endl;
+}
+
+void Graph_gen(bool** matrix, int n_){
 	
 	int n = n_;
 
@@ -69,14 +93,20 @@ void Graph_gen(bool** matrix, int n_)
 	matrix[half][half-1] = true;
 	matrix[half-1][half] = true;
 
-	/*for (int i = 0; i < n; i++) {
-		for (int j = 0; j < n; j++) {
-			cout << matrix[i][j] << " ";
-			
-		}
-		cout << endl;
-	}*/
+	if (n < 50) print_graph(matrix, n);
 
+}
+
+void matrix_to_list(vector<vector<int>>& list, bool** matrix, int n) {
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			if (i != j && matrix[i][j]) {
+				list[i].push_back(j);
+			}
+		}
+	}
+
+	print_graph(list, n);
 }
 
 void IS_CUTPOINT(int v) {
@@ -111,7 +141,29 @@ void dfs(int v, int p, int n, bool** g, int timer, bool* used, int* tin, int* fu
 		IS_CUTPOINT(v);
 }
 
+void dfs_list(int v, int p, int n, vector<vector<int>>& g, int timer, bool* used, int* tin, int* fup) {
 
+	used[v] = true;
+	timer++;
+	tin[v] = fup[v] = timer;
+	int children = 0;
+	for (size_t i = 0; i<g[v].size(); ++i) {
+		int to = g[v][i];
+		if (to == p)  continue;
+		if (used[to])
+			fup[v] = min(fup[v], tin[to]);
+		else {
+			dfs_list(to, p, n, g, timer, used, tin, fup);
+			fup[v] = min(fup[v], fup[to]);
+			if (fup[to] >= tin[v] && p != -1)
+				IS_CUTPOINT(v);
+			++children;
+		}
+	}
+	if (p == -1 && children > 1)
+		IS_CUTPOINT(v);
+
+}
 
 int main()
 {
@@ -128,14 +180,19 @@ int main()
 
 	cout << "Dfs begins!!!!!!!!!!" << endl;
 
+	//Создвние массивов, необходимых для работы алгоритма
 	bool* used = new bool[n];
 	memset(used, false, n);
 	int timer = 0;
 	int* tin = new int[n];
 	int* fup = new int[n];
-	dfs(0, -1, n, matrix, timer, used, tin, fup);
-	//cut_point(0, n, matrix);
+	vector<vector<int>> list;
+	list.resize(n);
+	list.shrink_to_fit();
 
+	matrix_to_list(list, matrix, n);
+	//dfs(0, -1, n, matrix, timer, used, tin, fup);
+	dfs_list(0, -1, n, list, timer, used, tin, fup);
 
 	system("pause");
 	return 0;
