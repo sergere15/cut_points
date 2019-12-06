@@ -4,6 +4,9 @@
 #include <vector>
 #include <algorithm>
 #include <assert.h>
+
+
+
 using namespace std;
 
 void print_graph(bool** matrix, int n){
@@ -171,14 +174,10 @@ void dfs_list(int v, int p, int n, vector<vector<int>>& g, int timer, bool* used
 
 int main()
 {
-	int n;
+	setlocale(LC_ALL, "Russian");
 
-
-
-	
-	
+	int n = 0;
 	int edges = 0;
-
 
 	for (int i = 0; i < 5; i++) {
 		for (int k = 0; k < 6; k++) {
