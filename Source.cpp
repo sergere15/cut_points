@@ -66,6 +66,11 @@ void Graph_gen(bool** matrix, int n_, int edges) {
 	{
 		tmp1 = rand() % half;
 		tmp2 = rand() % half;
+		if (tmp1 == tmp2)
+		{
+			i--;
+			continue;
+		}
 		matrix[tmp1][tmp2] = true;
 		matrix[tmp2][tmp1] = true;
 	}
@@ -86,8 +91,13 @@ void Graph_gen(bool** matrix, int n_, int edges) {
 	//Добавляем дополнительные ребра, чтобы не было слишком много точек сочленения 
 	for (int i = 0; i <edges - (edges / 2); i++)
 	{
-		tmp1 = rand() % (half)+(half);;
-		tmp2 = rand() % (half)+(half);;
+		tmp1 = rand() % (half)+(half);
+		tmp2 = rand() % (half)+(half);
+		if (tmp1 == tmp2)
+		{
+			i--;
+			continue;
+		}
 		matrix[tmp1][tmp2] = true;
 		matrix[tmp2][tmp1] = true;
 	}
@@ -117,8 +127,8 @@ void matrix_to_list(vector<vector<int>>& list, bool** matrix, int n) {
 }
 
 void IS_CUTPOINT(int v) {
-	if (print)
-	cout << "Cut point: " << v << endl;
+	if (0)
+		cout << "Cut point: " << v << endl;
 }
 
 void dfs(int v, int p, int n, bool** g, int timer, bool* used, int* tin, int* fup) {
@@ -169,7 +179,7 @@ void dfs_list(int v, int p, int n, vector<vector<int>>& g, int timer, bool* used
 		}
 	}
 	if (p == -1 && children > 1) //Проверка при условии, что вершина - корень
-		IS_CUTPOINT(v);
+		IS_CUTPOINT(v);	
 
 }
 
@@ -179,32 +189,37 @@ int main()
 	int n = 0;
 	int edges = 0;
 
-	for (int i = 0; i < 1; i++) {
-		for (int k = 0; k < 2; k++) {
+	for (int i = 1; i <= 4; i++) {
+		n = (i + 1) * 113; //Генерация кол-ва вершин
 
-			n = (i + 1) * 10; //Генерация кол-ва вершин
-			edges = (n - 1) + floor(3.7 * k);//Генерация кол-ва ребер
+		//Создание массивов, необходимых для работы алгоритма
+		bool* used = new bool[n];
+		memset(used, false, n);
+		int timer = 0;
+		int* tin = new int[n];
+		int* fup = new int[n];
 
-											 //Создвние массивов, необходимых для работы алгоритма
+		for (int k = 13; k <= 17; k++) {
+
+			edges = (n - 1) + floor(3.7 * k * k);//Генерация кол-ва ребер
+
+		  //Обнуление массивов, которые заполнялись на предыдущей итерации
+			memset(used, false, n);	
+			timer = 0;
+			
+			
+			cout << "/////////////////////////////////////////////" << endl;
+			cout << "Number of vertex: " << n << "  edges: " << edges << endl;
+
 			bool** matrix = new bool*[n];
 			for (int i1 = 0; i1 < n; i1++) {
 				matrix[i1] = new bool[n];
 				memset(matrix[i1], false, n);
 			}
+
 			vector<vector<int>> list;
 			list.resize(n);
 			list.shrink_to_fit();
-
-			bool* used = new bool[n];
-			memset(used, false, n);
-			int timer = 0;
-			int* tin = new int[n];
-			int* fup = new int[n];
-
-
-			cout << "/////////////////////////////////////////////" << endl;
-			cout << "Number of vertex: " << n << "  edges: " << edges << endl;
-
 			//Генерация входных данных
 			Graph_gen(matrix, n, edges);
 			matrix_to_list(list, matrix, n); //Convert matrix to list and delete matrix from memory
@@ -214,12 +229,10 @@ int main()
 			unsigned long long sum = 0;
 
 			for (int t = 0; t < 10; t++) {
-				if (t == 0) print_graph(list, n);
-				used = new bool[n];
+				//if (t == 0) print_graph(list, n);
+				
 				memset(used, false, n);
 				timer = 0;
-				tin = new int[n];
-				fup = new int[n];
 
 				size_t start = clock();
 
@@ -232,10 +245,11 @@ int main()
 			}
 			cout << "time of execution is " << (sum / 10000.) << " s" << endl << endl;
 			print = true;
-			delete[] used;
-			delete[] tin;
-			delete[] fup;
 		}
+		delete[] used;
+		delete[] tin;
+		delete[] fup;
+
 	}
 	system("pause");
 	return 0;
