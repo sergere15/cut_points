@@ -3,6 +3,7 @@
 #include <random>
 #include <vector>
 #include <algorithm>
+#include <assert.h>
 using namespace std;
 
 void print_graph(bool** matrix, int n){
@@ -27,17 +28,16 @@ void print_graph(vector<vector<int>>& x, int n) {
 		cout << endl;
 	}
 
-	cout << "////////////////////////" << endl;
 }
 
-void Graph_gen(bool** matrix, int n_){
+void Graph_gen(bool** matrix, int n_, int edges){
 	
 	int n = n_;
 
 	
-
-	//Задается количество ребер, которые необходимо сгенерировать 
-	int num_of_edjes = ceil(n*1.8);
+	if (edges < (n - 1)) assert("Wrong number of edges");
+	//Задается количество ребер, которые необходимо догенерировать 
+	edges -= (n - 1);
 
 	int tmp = 0;
 	//int tmp2 = 0;
@@ -59,7 +59,7 @@ void Graph_gen(bool** matrix, int n_){
 	//Добавляем дополнительные ребра, чтобы не было слишком много точек сочленения 
 	int tmp1 = 0;
 	int tmp2 = 0;
-	for (int i = 0; i < n / 4; i++)
+	for (int i = 0; i < edges / 2; i++)
 	{
 		tmp1 = rand() % half;
 		tmp2 = rand() % half;
@@ -81,7 +81,7 @@ void Graph_gen(bool** matrix, int n_){
 	}
 
 	//Добавляем дополнительные ребра, чтобы не было слишком много точек сочленения 
-	for (int i = 0; i < n / 4; i++)
+	for (int i = 0; i <edges - (edges / 2); i++)
 	{
 		tmp1 = rand() % (half) + (half);;
 		tmp2 = rand() % (half) + (half);;
@@ -93,7 +93,7 @@ void Graph_gen(bool** matrix, int n_){
 	matrix[half][half-1] = true;
 	matrix[half-1][half] = true;
 
-	if (n < 50) print_graph(matrix, n);
+	//if (n < 50) print_graph(matrix, n);
 
 }
 
@@ -106,7 +106,11 @@ void matrix_to_list(vector<vector<int>>& list, bool** matrix, int n) {
 		}
 	}
 
-	print_graph(list, n);
+	for (int p = 0; p < n; p++) {
+		delete[] matrix[p];
+	}
+
+	if (n < 50) print_graph(list, n);
 }
 
 void IS_CUTPOINT(int v) {
@@ -155,12 +159,12 @@ void dfs_list(int v, int p, int n, vector<vector<int>>& g, int timer, bool* used
 		else {
 			dfs_list(to, p, n, g, timer, used, tin, fup);
 			fup[v] = min(fup[v], fup[to]);
-			if (fup[to] >= tin[v] && p != -1)
+			if (fup[to] >= tin[v] && p != -1)//Стандартное условие алгоритма
 				IS_CUTPOINT(v);
 			++children;
 		}
 	}
-	if (p == -1 && children > 1)
+	if (p == -1 && children > 1) //Проверка при условии, что вершина - корень
 		IS_CUTPOINT(v);
 
 }
@@ -168,32 +172,57 @@ void dfs_list(int v, int p, int n, vector<vector<int>>& g, int timer, bool* used
 int main()
 {
 	int n;
-	cin >> n;
 
-	bool** matrix = new bool*[n];
-	for (int i = 0; i < n; i++) {
-		matrix[i] = new bool[n];
-		memset(matrix[i], false, n);
+
+
+	
+	
+	int edges = 0;
+
+
+	for (int i = 0; i < 5; i++) {
+		for (int k = 0; k < 6; k++) {
+			n = (i + 1) * 10; //Генерация кол-ва вершин
+			edges = (n - 1) + floor(3.7 * k);//Генерация кол-ва ребер
+			
+			//Создвние массивов, необходимых для работы алгоритма
+			bool** matrix = new bool*[n];
+			for (int i = 0; i < n; i++) {
+				matrix[i] = new bool[n];
+				memset(matrix[i], false, n);
+			}
+
+			bool* used = new bool[n];
+			memset(used, false, n);
+			int timer = 0;
+			int* tin = new int[n];
+			int* fup = new int[n];
+			vector<vector<int>> list;
+			list.resize(n);
+			list.shrink_to_fit();
+
+			cout << "/////////////////////////////////////////////" << endl;
+			cout << "Number of vertex: " << n << "  edges: " << edges << endl;
+
+			//Генерация входных данных
+			Graph_gen(matrix, n, edges);
+			matrix_to_list(list, matrix, n); //Convert matrix to list and delete matrix from memory
+
+			//dfs(0, -1, n, matrix, timer, used, tin, fup);
+
+			
+			size_t start = clock();
+
+			//Вызов самого алгоритма
+			dfs_list(0, -1, n, list, timer, used, tin, fup);
+
+			size_t end = clock();
+			cout << "time of execution is " << start / 1000. << " s" << endl << endl;
+			delete[] used;
+			delete[] tin;
+			delete[] fup;
+		}
 	}
-
-	Graph_gen(matrix, n);
-
-	cout << "Dfs begins!!!!!!!!!!" << endl;
-
-	//Создвние массивов, необходимых для работы алгоритма
-	bool* used = new bool[n];
-	memset(used, false, n);
-	int timer = 0;
-	int* tin = new int[n];
-	int* fup = new int[n];
-	vector<vector<int>> list;
-	list.resize(n);
-	list.shrink_to_fit();
-
-	matrix_to_list(list, matrix, n);
-	//dfs(0, -1, n, matrix, timer, used, tin, fup);
-	dfs_list(0, -1, n, list, timer, used, tin, fup);
-
-	system("pause");
+ 	system("pause");
 	return 0;
 }
